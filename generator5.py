@@ -41,7 +41,7 @@ for _ in range(int(input('Введите количество текстов д�
 open('button.json', 'w').write(json.dumps(button, indent=4, ensure_ascii=False))
 
 # Указание путя для отрисовки графов
-os.environ["PATH"] += os.pathsep + 'C:\\Program Files\\Graphviz\\bin' #
+os.environ["PATH"] += os.pathsep + 'C:\\Program Files\\Graphviz\\bin'
 
 adj_list = json.load(open('adjacency_list.json', 'r'))
 button_list = json.load(open('button.json', 'r'))
@@ -54,13 +54,31 @@ os.chdir(s)
 # Создание графа
 g = graphviz.Digraph('Graph for bot', comment='Your graph', format='png')
 
+# Создание нормальных окон(не однострочных)
 for i in range(len(adj_list)):
-    g.node(f'{i}', text_list[i] if text_list[i] else f'No text for vertex №{i}')
+    text_split = text_list[i].split()
+    text = ''
+    l = 0
+    for j in range(len(text_split)):
+        if l <= 20:
+            text += text_split[j]
+            l += len(text_split[j])
+        else:
+            text += '\n'
+            text += text_split[j]
+            l = 0
+            l += len(text_split[j])
+
+    if not text:
+        text = f'No text for vertex №{i}'
+    else:
+        pass
+    g.node(f'{i}', text)
 
 for i, h in enumerate(adj_list):
     for j in h:
         g.edge(f'{i}', f'{j}',
-               label=button_list[i][j] if button_list[i][j] else f'No text wor edge from {i} to {j}')
+               label=button_list[i][j] if button_list[i][j] else f'No text for edge from {i} to {j}')
 
 print('Вы хотите увидеть получившийся граф?(Y/N)')
 if input() == 'Y':
